@@ -1,6 +1,6 @@
 {
-  "name": "QuickPerfo - Check In",
-  "short_name": "QuickPerfo",
+  "name": "PocketPerfo - Check In",
+  "short_name": "PocketPerfo",
   "description": "Aplicación para revisar performance de representantes",
   "start_url": "https://elnunezz.github.io/quickperf-pwa/",
   "scope": "https://elnunezz.github.io/quickperf-pwa/",
