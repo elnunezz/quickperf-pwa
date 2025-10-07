@@ -3,7 +3,7 @@
   "short_name": "QuickPerfo",
   "description": "Aplicación para revisar performance de representantes",
   "start_url": "https://elnunezz.github.io/quickperf-pwa/",
-  "scope": "/",
+  "scope": "https://elnunezz.github.io/quickperf-pwa/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#FFE600",
