@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quickperfo-v1.0.0';
+const CACHE_NAME = 'pocketperfo-v1.0.0';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -66,7 +66,7 @@ self.addEventListener('fetch', event => {
         // Página offline simple
         if (event.request.destination === 'document') {
           return new Response(
-            '<h1>Sin conexión</h1><p>QuickPerfo requiere conexión a internet.</p>',
+            '<h1>Sin conexión</h1><p>PocketPerfo requiere conexión a internet.</p>',
             { headers: { 'Content-Type': 'text/html' } }
           );
         }
