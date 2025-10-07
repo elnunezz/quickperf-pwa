@@ -4,113 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuickPerfo - Check In</title>
-    <meta name="description" content="Aplicación para revisar performance de representantes">
+    
+    <!-- Favicon para la ventana del navegador -->
+    <link rel="icon" type="image/png" href="https://i.imgur.com/aNxDcLC.png">
+    <link rel="shortcut icon" type="image/png" href="https://i.imgur.com/aNxDcLC.png">
+    
+    <!-- Manifest para la PWA -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags para PWA -->
     <meta name="theme-color" content="#FFE600">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="https://i.imgur.com/aNxDcLC.png">
-    <link rel="apple-touch-icon" href="https://i.imgur.com/aNxDcLC.png">
+    <meta name="apple-mobile-web-app-title" content="QuickPerfo">
+    
     <style>
-        body { 
-            margin: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow: hidden;
         }
-        #app-frame {
-            width: 100%;
-            height: 100vh;
-            border: none;
-            background: white;
-        }
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 18px;
-            z-index: 1000;
-        }
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid #FFE600;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .error {
-            color: #ff6b6b;
-            text-align: center;
+
+        .header {
+            background: linear-gradient(45deg, #FFE600, #FFF200);
             padding: 20px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 8px;
-            margin-top: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .search-container {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: #667eea;
+        }
+
+        .results {
+            min-height: 200px;
+            padding: 20px;
+        }
+
+        .person-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .person-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .person-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .person-details {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .search-container {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div>Cargando QuickPerfo...</div>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 QuickPerfo - Check In</h1>
+            <p>Búsqueda rápida de personal</p>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" 
+                   class="search-box" 
+                   id="searchInput" 
+                   placeholder="Buscar por nombre, cédula o código..."
+                   autocomplete="off">
+        </div>
+        
+        <div class="results" id="results">
+            <div class="loading">
+                Cargando datos...
+            </div>
+        </div>
     </div>
-    <iframe id="app-frame" style="display: none;"></iframe>
-    
-    <script>
-        // URL de tu Apps Script (CAMBIAR ESTA URL)
-        const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/mercadolibre.com/s/AKfycbx9ccSL6jtWrVeUi8CDEQXJSaMywjEC3P0h2LrmemI067gHhsnl1K-OkXuG0MY5_4WN5Q/exec';
-        
-        // Registrar Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW registrado'))
-                .catch(err => console.log('SW error:', err));
-        }
-        
-        // Cargar aplicación
-        const iframe = document.getElementById('app-frame');
-        const loading = document.getElementById('loading');
-        
-        if (APPS_SCRIPT_URL === 'AQUI_VA_TU_URL_DE_APPS_SCRIPT') {
-            loading.innerHTML = '<div class="error">⚠️ Configuración pendiente<br>Contacta al administrador</div>';
-        } else {
-            iframe.src = APPS_SCRIPT_URL;
-            
-            iframe.onload = function() {
-                loading.style.display = 'none';
-                iframe.style.display = 'block';
-            };
-            
-            iframe.onerror = function() {
-                loading.innerHTML = '<div class="error">❌ Error al cargar la aplicación<br>Verifica tu conexión</div>';
-            };
-            
-            // Timeout de 10 segundos
-            setTimeout(() => {
-                if (loading.style.display !== 'none') {
-                    loading.innerHTML = '<div class="error">⏱️ La aplicación está tardando mucho<br>Verifica tu conexión</div>';
-                }
-            }, 10000);
-        }
 
-        // Prevenir zoom en iOS
-        document.addEventListener('gesturestart', function (e) {
-            e.preventDefault();
-        });
+    <script src="script.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
